@@ -108,7 +108,8 @@ extension HeroTransition {
     }
     transitionContainer?.addSubview(container)
 
-    context = HeroContext(container: container)
+    let heroContext = HeroContext(container: container)
+    context = heroContext
 
     processors.forEach {
       $0.hero = self
@@ -135,8 +136,8 @@ extension HeroTransition {
         toView.frame = frame
       }
 
-      context.loadViewAlpha(rootView: toView)
-      context.loadViewAlpha(rootView: fromView)
+      heroContext.loadViewAlpha(rootView: toView)
+      heroContext.loadViewAlpha(rootView: fromView)
       container.addSubview(toView)
       container.addSubview(fromView)
 
@@ -152,28 +153,28 @@ extension HeroTransition {
       toView.setNeedsLayout()
       toView.layoutIfNeeded()
 
-      context.set(fromViews: fromView.flattenedViewHierarchy, toViews: toView.flattenedViewHierarchy)
+      heroContext.set(fromViews: fromView.flattenedViewHierarchy, toViews: toView.flattenedViewHierarchy)
     }
 
     if (viewOrderingStrategy == .auto && !isPresenting && !inTabBarController) ||
        viewOrderingStrategy == .sourceViewOnTop {
-      context.insertToViewFirst = true
+      heroContext.insertToViewFirst = true
     }
 
     processors.forEach {
-      $0.process(fromViews: context.fromViews, toViews: context.toViews)
+      $0.process(fromViews: heroContext.fromViews, toViews: heroContext.toViews)
     }
 
-    animatingFromViews = context.fromViews.filter { (view: UIView) -> Bool in
+    animatingFromViews = heroContext.fromViews.filter { (view: UIView) -> Bool in
       animators.contains { $0.canAnimate(view: view, appearing: false) }
     }
 
-    animatingToViews = context.toViews.filter { (view: UIView) -> Bool in
+    animatingToViews = heroContext.toViews.filter { (view: UIView) -> Bool in
       animators.contains { $0.canAnimate(view: view, appearing: true) }
     }
 
     if let toView = toView {
-      context.hide(view: toView)
+      heroContext.hide(view: toView)
     }
 
     #if os(tvOS)
